@@ -5,6 +5,7 @@ namespace DDD\User\Application;
 use DDD\User\Application\Input\UpdateUserInput;
 use DDD\User\Application\Output\UpdateUserOutput;
 use DDD\User\Domain\Email;
+use DDD\User\Domain\User;
 use DDD\User\Infra\Repository\UserRepositoryI;
 
 final class UpdateUser
@@ -17,12 +18,8 @@ final class UpdateUser
     public function execute(UpdateUserInput $input): UpdateUserOutput
     {
         $email = new Email($input->email);
-        $user = $this->repo->findByEmail($email);
-        if ($user?->id === $input->id) {
-            throw new \DomainException('this is the current user email');
-        }
-        if ($user) {
-            throw new \DomainException('this email is already exist');
+        if ($this->repo->isEmailUnique($email)) {
+            throw new \DomainException('this email already exist');
         }
 
         $user = $this->repo->findById($input->id);

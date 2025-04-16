@@ -32,6 +32,11 @@ final class UserRepositoryInMemory implements UserRepositoryI
         });
     }
 
+    public function isEmailUnique(Email $email): bool
+    {
+        return $this->findByEmail($email) === null;
+    }
+
     public function update(User $user): void
     {
         foreach ($this->storage as $key => $existingUser) {

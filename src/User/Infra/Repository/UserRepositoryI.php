@@ -11,4 +11,5 @@ interface UserRepositoryI
     public function update(User $user): void;
     public function findById(string $id): ?User;
     public function findByEmail(Email $email): ?User;
+    public function isEmailUnique(Email $email): bool;
 }
