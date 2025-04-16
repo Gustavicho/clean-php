@@ -18,7 +18,7 @@ final class RegisterUser
     public function execute(RegisterUserInput $input): RegisterUserOutput
     {
         $email = new Email($input->email);
-        if ($this->repo->findByEmail($email)) {
+        if (! $this->repo->isEmailUnique($email)) {
             throw new \DomainException('This email already exist');
         }
 
