@@ -21,7 +21,7 @@ final class Plan
         }
     }
 
-    public static function create(string $id, string $name, Money $price, Duration $duration): self
+    public static function create(string $name, Money $price, Duration $duration): self
     {
         return new self(RandomGenerator::UUID(), $name, $price, $duration);
     }
