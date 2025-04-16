@@ -2,18 +2,13 @@
 
 namespace DDD\Plan\Application;
 
+use DDD\Plan\Application\Input\CreatePlanInput;
+use DDD\Plan\Application\Output\CreatePlanOutput;
+
 final class CreatePlan
 {
     public function execute(CreatePlanInput $input): CreatePlanOutput
     {
         return new CreatePlanOutput();
     }
-}
-
-final readonly class CreatePlanInput
-{
-}
-
-final readonly class CreatePlanOutput
-{
 }
