@@ -4,10 +4,9 @@ namespace DDD\Subscription\Domain;
 
 use Brick\Money\Currency;
 use Brick\Money\Money;
+use DDD\Service\Random\RandomGenerator;
 use DDD\Subscription\Domain\State\PendingState;
 use DDD\Subscription\Domain\State\SubscriptionState;
-
-use function DDD\Bundle\generateRandomUUID;
 
 final class Subscription
 {
@@ -25,7 +24,7 @@ final class Subscription
     public static function create(string $userId, string $planId, Money $price, Period $period): self
     {
         return new self(
-            generateRandomUUID(),
+            RandomGenerator::UUID(),
             $userId,
             $planId,
             $period,

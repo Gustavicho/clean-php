@@ -2,7 +2,7 @@
 
 namespace DDD\User\Domain;
 
-use function DDD\Bundle\generateRandomUUID;
+use DDD\Service\Random\RandomGenerator;
 
 final class User
 {
@@ -16,7 +16,7 @@ final class User
     public static function create(string $name, Email $email): self
     {
         return new self(
-            generateRandomUUID(),
+            RandomGenerator::UUID(),
             $email,
             $name,
         );

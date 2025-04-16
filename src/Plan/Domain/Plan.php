@@ -3,8 +3,7 @@
 namespace DDD\Plan\Domain;
 
 use Brick\Money\Money;
-
-use function DDD\Bundle\generateRandomUUID;
+use DDD\Service\Random\RandomGenerator;
 
 final class Plan
 {
@@ -24,6 +23,6 @@ final class Plan
 
     public static function create(string $id, string $name, Money $price, Duration $duration): self
     {
-        return new self(generateRandomUUID(), $name, $price, $duration);
+        return new self(RandomGenerator::UUID(), $name, $price, $duration);
     }
 }
