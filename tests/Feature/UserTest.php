@@ -39,7 +39,7 @@ describe('User creation', function () {
 
         expect(
             fn () => (new RegisterUser($repo->user))->execute($input)
-        )->toThrow(DomainException::class, 'Email already in use');
+        )->toThrow(DomainException::class, 'This email already exist');
     });
 });
 
@@ -90,7 +90,7 @@ describe('User update', function () {
         $input = new UpdateUserInput('no-id', 'Name', 'no@user.com');
 
         expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
-            ->toThrow(DomainException::class, 'User not found');
+            ->toThrow(DomainException::class, 'user not found');
     });
 
     it('fails when new email collides with another user', function () {
@@ -100,6 +100,6 @@ describe('User update', function () {
         $input = new UpdateUserInput('id-1', 'Name', 'taken@example.com');
 
         expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
-            ->toThrow(DomainException::class, 'Email already in use');
+            ->toThrow(DomainException::class, 'This email already exist');
     });
 });
