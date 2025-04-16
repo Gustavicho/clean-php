@@ -2,6 +2,8 @@
 
 namespace DDD\Plan\Domain;
 
+use DDD\Subscription\Domain\Period;
+
 final class Duration
 {
     private const UNIT_MAP = [
@@ -34,5 +36,13 @@ final class Duration
         $format = sprintf(self::UNIT_MAP[$this->unit], $this->quantity);
         $interval = new \DateInterval($format);
         return $start->add($interval);
+    }
+
+    public function toPeriod(\DateTimeImmutable $start): Period
+    {
+        return new Period(
+            $start,
+            $this->endsAt($start),
+        );
     }
 }
