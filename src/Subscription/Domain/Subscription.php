@@ -14,10 +14,11 @@ final class Subscription
         public readonly string $id,
         public readonly string $userId,
         public readonly string $planId,
+        public readonly Money $price,
         public Period $period,
-        public Money $basePrice,
         private SubscriptionState $state,
         private Money $fee,
+        private Money $discount
     ) {
     }
 
@@ -27,9 +28,10 @@ final class Subscription
             RandomGenerator::UUID(),
             $userId,
             $planId,
-            $period,
             $price,
+            $period,
             new PendingState(),
+            Money::zero(Currency::of('BRL')),
             Money::zero(Currency::of('BRL'))
         );
     }
