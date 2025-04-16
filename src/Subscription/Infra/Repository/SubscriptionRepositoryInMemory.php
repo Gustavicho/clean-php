@@ -24,6 +24,18 @@ final class SubscriptionRepositoryInMemory implements SubscriptionRepositoryI
         });
     }
 
+    public function update(Subscription $subscription): void
+    {
+        foreach ($this->storage as $key => $existingSubscription) {
+            if ($existingSubscription->id === $subscription->id) {
+                $this->storage[$key] = $subscription;
+                return;
+            }
+        }
+
+        throw new \DomainException('User not found for update');
+    }
+
     private function filter(\Closure $closure): \ArrayObject
     {
         $subscriptions = [];

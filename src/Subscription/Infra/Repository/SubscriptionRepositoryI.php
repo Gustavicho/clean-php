@@ -8,4 +8,5 @@ interface SubscriptionRepositoryI
 {
     public function save(Subscription $subscription): void;
     public function findById(string $id): ?Subscription;
+    public function update(Subscription $subscription): void;
 }
