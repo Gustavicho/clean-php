@@ -2,7 +2,7 @@
 
 namespace DDD\User\Infra\Repository;
 
-use User;
+use DDD\User\Domain\User;
 
 interface UserRepositoryI
 {
