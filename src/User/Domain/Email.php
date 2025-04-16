@@ -4,16 +4,15 @@ namespace DDD\User\Domain;
 
 final class Email
 {
-    public function __construct(
-        public readonly string $value
-    ) {
-        $this->validate();
-    }
+    public readonly string $value;
 
-    private function validate(): void
+    public function __construct(string $value)
     {
-        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
+        $cleaned = trim($value);
+        if (!filter_var($cleaned, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException('The email doesn\'t fit in the format');
         }
+
+        $this->value = $cleaned;
     }
 }
