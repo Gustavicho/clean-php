@@ -16,8 +16,11 @@ final class Plan
         if ($name === '') {
             throw new \InvalidArgumentException('Name cannot be empty');
         }
-        if ($price->isNegative()) {
+        if ($price->isNegativeOrZero()) {
             throw new \InvalidArgumentException('Price must be non-negative');
+        }
+        if ($duration->isNegativeOrZero()) {
+            throw new \InvalidArgumentException('Duration must not be zero or lower');
         }
     }
 

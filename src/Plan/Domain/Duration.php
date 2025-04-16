@@ -45,4 +45,29 @@ final class Duration
             $this->endsAt($start),
         );
     }
+
+    public function isZero(): bool
+    {
+        return $this->quantity === 0;
+    }
+
+    public function isNegative(): bool
+    {
+        return $this->quantity < 0;
+    }
+
+    public function isPositive(): bool
+    {
+        return $this->quantity > 0;
+    }
+
+    public function isNegativeOrZero(): bool
+    {
+        return $this->quantity <= 0;
+    }
+
+    public function isPositiveOrZero(): bool
+    {
+        return $this->quantity >= 0;
+    }
 }
