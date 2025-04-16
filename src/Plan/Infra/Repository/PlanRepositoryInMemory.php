@@ -24,6 +24,19 @@ final class PlanRepositoryInMemory implements PlanRepositoryI
         });
     }
 
+    public function update(Plan $plan): void
+    {
+        foreach ($this->storage as $key => $existingPlan) {
+            if ($existingPlan->id === $plan->id) {
+                $this->storage[$key] = $plan;
+                return;
+            }
+        }
+
+        throw new \DomainException('Plan not found for update');
+    }
+
+    /** @return ArrayObject<Plan> */
     private function filter(\Closure $closure): \ArrayObject
     {
         $plans = [];
