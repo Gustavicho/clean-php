@@ -100,6 +100,6 @@ describe('User update', function () {
         $input = new UpdateUserInput('id-1', 'Name', 'taken@example.com');
 
         expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
-            ->toThrow(DomainException::class, 'This email already exist');
+            ->toThrow(DomainException::class, 'this email already exist');
     });
 });
