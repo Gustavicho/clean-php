@@ -32,6 +32,18 @@ final class UserRepositoryInMemory implements UserRepositoryI
         });
     }
 
+    public function update(User $user): void
+    {
+        foreach ($this->storage as $key => $existingUser) {
+            if ($existingUser->id === $user->id) {
+                $this->storage[$key] = $user;
+                return;
+            }
+        }
+
+        throw new \DomainException('User not found for update');
+    }
+
     /** @return ArrayObject<User> */
     private function filter(\Closure $closure): \ArrayObject
     {
