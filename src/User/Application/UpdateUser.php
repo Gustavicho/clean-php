@@ -17,25 +17,30 @@ final class UpdateUser
 
     public function execute(UpdateUserInput $input): UpdateUserOutput
     {
-        $email = new Email($input->email);
-        if ($this->repo->isEmailUnique($email)) {
-            throw new \DomainException('this email already exist');
-        }
-
         $user = $this->repo->findById($input->id);
         if (!$user) {
             throw new \DomainException('user not found');
         }
 
-        $user->name = $input->name;
-        $user->email = $email;
+        if ($input->email !== null) {
+            $email = new Email($input->email);
+            if (! $this->repo->isEmailUnique($email)) {
+                throw new \DomainException('this email already exist');
+            }
+        }
 
-        $this->repo->update($user);
+        $newUser = new User(
+            $user->id,
+            $email ?? $user->email,
+            $input->name ?? $user->name,
+        );
+
+        $this->repo->update($newUser);
 
         return new UpdateUserOutput(
-            $user->id,
-            $user->name,
-            $user->email
+            $newUser->id,
+            $newUser->name,
+            $newUser->email
         );
     }
 }
