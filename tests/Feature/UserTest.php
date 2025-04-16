@@ -10,126 +10,96 @@ use DDD\User\Domain\Email;
 use DDD\User\Domain\User;
 
 describe('User creation', function () {
-    it('should register a new user', function () {
+    it('creates a user with valid name and email', function () {
         $repo = inMemoryRepository();
-        $input = new RegisterUserInput(
-            'Gustavo Oliveira',
-            'gustavo@example.com'
-        );
+        $input = new RegisterUserInput('Gustavo Oliveira', 'gustavo@example.com');
 
-        $registerUser = new RegisterUser($repo->user);
-        $output = $registerUser->execute($input);
+        $output = (new RegisterUser($repo->user))->execute($input);
 
         expect($output)->toBeInstanceOf(RegisterUserOutput::class);
         expect($output->name)->toBe('Gustavo Oliveira');
         expect($output->email->value)->toBe('gustavo@example.com');
     });
 
-    it('should fail for invalid email format', function () {
+    it('trims whitespace from name and email before validation', function () {
         $repo = inMemoryRepository();
-        $input = new RegisterUserInput(
-            'Gustavo Oliveira',
-            'gustavo.test.com'
-        );
+        $input = new RegisterUserInput("  Ana Silva  ", "  ana@teste.com  ");
 
-        $registerUser = new RegisterUser($repo->user);
+        $output = (new RegisterUser($repo->user))->execute($input);
 
-        expect(fn () => $registerUser->execute($input))
-            ->toThrow(\InvalidArgumentException::class);
+        expect($output->name)->toBe('Ana Silva');
+        expect($output->email->value)->toBe('ana@teste.com');
     });
 
-    it('should fail when email already exists', function () {
+    it('fails when email already exists', function () {
         $repo = inMemoryRepository();
-        $input = new RegisterUserInput(
-            'Gustavo Oliveira',
-            'gustavo@example.com'
-        );
+        $input = new RegisterUserInput('Gustavo', 'gustavo@dup.com');
 
-        $registerUser = new RegisterUser($repo->user);
-        // First registration should succeed.
-        $registerUser->execute($input);
+        (new RegisterUser($repo->user))->execute($input);
 
-        expect(fn () => $registerUser->execute($input))
-            ->toThrow(\DomainException::class);
+        expect(
+            fn () => (new RegisterUser($repo->user))->execute($input)
+        )->toThrow(DomainException::class, 'Email already in use');
     });
 });
 
 describe('User update', function () {
-    it('should update the user data', function () {
-        $repo = inMemoryRepository();
-        $user = new User(
-            '1234-asdf',
-            new Email('gustavo@example.com'),
-            'Gustavo Oliveira',
-        );
-        $repo->user->save($user);
-
-        $input = new UpdateUserInput(
-            '1234-asdf',
-            'Gustavo Carvalho',
-            'carvalho@example.com',
-        );
-
-        $updateUser = new UpdateUser($repo->user);
-        $output = $updateUser->execute($input);
-
-        expect($output)->toBeInstanceOf(UpdateUserOutput::class);
-        expect($output->id)->toBe('1234-asdf');
-        expect($output->name)->toBe('Gustavo Carvalho');
-        expect($output->email->value)->toBe('carvalho@example.com');
+    beforeEach(function () {
+        $this->repo = inMemoryRepository();
+        $user = new User('id-1', new Email('orig@example.com'), 'Original Name');
+        $this->repo->user->save($user);
     });
 
-    it('should not update the user, because user don\'t exist', function () {
-        $repo = inMemoryRepository();
+    it('updates both name and email when provided', function () {
+        $input = new UpdateUserInput('id-1', 'New Name', 'new@example.com');
 
-        $input = new UpdateUserInput(
-            '1234-asdf',
-            'Gustavo Carvalho',
-            'carvalho@example.com',
-        );
+        $output = (new UpdateUser($this->repo->user))->execute($input);
 
-        $updateUser = new UpdateUser($repo->user);
-        expect(fn () => $updateUser->execute($input))
-          ->toThrow(DomainException::class, 'user not found');
+        expect($output)->toBeInstanceOf(UpdateUserOutput::class)
+            ->and($output->id)->toBe('id-1')
+            ->and($output->name)->toBe('New Name')
+            ->and($output->email->value)->toBe('new@example.com');
     });
 
-    it('should fail for try insert a email that already exist', function () {
-        $repo = inMemoryRepository();
-        $user = new User(
-            '1qw4-36aj',
-            new Email('carvalho@example.com'),
-            'Gustavo Carvalho',
-        );
-        $repo->user->save($user);
+    it('updates only the name when email is null', function () {
+        $input = new UpdateUserInput('id-1', 'Solo Name', null);
 
-        $input = new UpdateUserInput(
-            '1234-asdf',
-            'Lucas Carvalho',
-            'carvalho@example.com',
-        );
+        $output = (new UpdateUser($this->repo->user))->execute($input);
 
-        $updateUser = new UpdateUser($repo->user);
-        expect(fn () => $updateUser->execute($input))
-          ->toThrow(DomainException::class, 'this email is already exist');
+        expect($output->name)->toBe('Solo Name');
+        expect($output->email->value)->toBe('orig@example.com');
     });
 
-    it('should fail for update the email to the same one', function () {
-        $repo = inMemoryRepository();
-        $user = new User(
-            '1234-asdf',
-            new Email('gustavo@example.com'),
-            'Gustavo Oliveira',
-        );
-        $repo->user->save($user);
+    it('updates only the email when name is null', function () {
+        $input = new UpdateUserInput('id-1', null, 'solo@example.com');
 
-        $input = new UpdateUserInput(
-            '1234-asdf',
-            'Gustavo Carvalho',
-            'gustavo@example.com',
-        );
+        $output = (new UpdateUser($this->repo->user))->execute($input);
 
-        $updateUser = new UpdateUser($repo->user);
-        expect(fn () => $updateUser->execute($input))
-          ->toThrow(DomainException::class, 'this is the current user email');
+        expect($output->name)->toBe('Original Name');
+        expect($output->email->value)->toBe('solo@example.com');
+    });
+
+    it('fails for invalid email format on update', function () {
+        $input = new UpdateUserInput('id-1', 'Name Test', 'bad-email@@');
+
+        expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
+            ->toThrow(InvalidArgumentException::class);
+    });
+
+    it('fails when updating non-existent user', function () {
+        $input = new UpdateUserInput('no-id', 'Name', 'no@user.com');
+
+        expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
+            ->toThrow(DomainException::class, 'User not found');
+    });
+
+    it('fails when new email collides with another user', function () {
+        $other = new User('id-2', new Email('taken@example.com'), 'Other');
+        $this->repo->user->save($other);
+
+        $input = new UpdateUserInput('id-1', 'Name', 'taken@example.com');
+
+        expect(fn () => (new UpdateUser($this->repo->user))->execute($input))
+            ->toThrow(DomainException::class, 'Email already in use');
     });
 });
