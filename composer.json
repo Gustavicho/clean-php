@@ -1,0 +1,26 @@
+{
+  "autoload": {
+    "psr-4": {
+      "DDD\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "test/"
+    }
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.8"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "require": {
+    "brick/money": "^0.10.1"
+  }
+}
