@@ -2,6 +2,8 @@
 
 namespace DDD\User\Domain;
 
+use function DDD\Bundle\generateRandomUUID;
+
 final class User
 {
     public function __construct(
@@ -9,5 +11,14 @@ final class User
         public Email $email,
         public string $name,
     ) {
+    }
+
+    public static function create(string $name, Email $email): self
+    {
+        return new self(
+            generateRandomUUID(),
+            $email,
+            $name,
+        );
     }
 }
