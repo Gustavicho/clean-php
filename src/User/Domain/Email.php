@@ -12,7 +12,7 @@ final class Email
 
     private function validate(): void
     {
-        if (filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException('The email doesn\'t fit in the format');
         }
     }
