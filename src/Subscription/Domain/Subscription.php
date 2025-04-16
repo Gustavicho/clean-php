@@ -13,7 +13,7 @@ final class Subscription
     public function __construct(
         public readonly string $id,
         public readonly string $userId,
-        public string $planId,
+        public readonly string $planId,
         public Period $period,
         public Money $basePrice,
         private SubscriptionState $state,
