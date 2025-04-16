@@ -2,13 +2,8 @@
 
 namespace DDD\User\Infra\Repository;
 
+use DDD\User\Domain\Email;
 use DDD\User\Domain\User;
-
-interface UserRepositoryI
-{
-    public function save(User $user): void;
-    public function findById(string $id): ?User;
-}
 
 final class UserRepositoryInMemory implements UserRepositoryI
 {
@@ -30,6 +25,14 @@ final class UserRepositoryInMemory implements UserRepositoryI
         });
     }
 
+    public function findByEmail(Email $email): ?User
+    {
+        return $this->firstWhere(function (User $user) use ($email) {
+            return $user->email == $email;
+        });
+    }
+
+    /** @return ArrayObject<User> */
     private function filter(\Closure $closure): \ArrayObject
     {
         $users = [];

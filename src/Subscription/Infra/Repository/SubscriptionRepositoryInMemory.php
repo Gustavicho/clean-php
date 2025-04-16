@@ -4,12 +4,6 @@ namespace DDD\Subscription\Infra\Repository;
 
 use DDD\Subscription\Domain\Subscription;
 
-interface SubscriptionRepositoryI
-{
-    public function save(Subscription $subscription): void;
-    public function findById(string $id): ?Subscription;
-}
-
 final class SubscriptionRepositoryInMemory implements SubscriptionRepositoryI
 {
     public function __construct(
