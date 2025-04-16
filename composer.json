@@ -18,7 +18,10 @@
     }
   },
   "scripts": {
-    "test": "vendor/bin/pest"
+    "test": "vendor/bin/pest",
+    "test:fails": "vendor/bin/pest --compact",
+    "test:async": "vendor/bin/pest --parallel",
+    "test:slows": "vendor/bin/pest --profile"
   },
   "require": {
     "brick/money": "^0.10.1"
