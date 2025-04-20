@@ -9,6 +9,7 @@ use DDD\Subscription\Application\CancelSubscription;
 use DDD\Subscription\Application\ChangePlan;
 use DDD\Subscription\Application\Input\CancelSubscriptionInput;
 use DDD\Subscription\Application\Input\ChangePlanInput;
+use DDD\Subscription\Application\RenewPlan;
 use DDD\Subscription\Domain\State\CancelledState;
 use DDD\Subscription\Domain\State\PendingState;
 use DDD\Subscription\Domain\Subscription;
@@ -108,6 +109,7 @@ describe('Changing plan', function () {
             $planOld->price,
             $period,
         );
+
         $repo->user->save($user);
         $repo->plan->save($planOld);
         $repo->plan->save($planNew);
@@ -124,16 +126,6 @@ describe('Changing plan', function () {
         expect($output->period->start)->toBe($time->getTimeNow());
         expect($output->state)->toBeInstanceOf(PendingState::class);
     });
-
-    // it('should fail if trying to change to the same plan', function () {
-    //     // ... setup idêntico, mas $input com o mesmo planId
-    //     expect(fn () => $useCase->execute($input))
-    //         ->toThrow(\DomainException::class);
-    // });
-
-    // it('should fail if user or plan not found or subscription inactive', function () {
-    //     // combine os três cenários de falha em it() separados
-    // });
 });
 
 describe('Renewing plan', function () {
@@ -143,24 +135,23 @@ describe('Renewing plan', function () {
 
         $user = User::create('Bruno', new Email('bruno@test.com'));
         $plan = Plan::create('gold', Money::of(200, 'BRL'), Duration::fromString('1 month'));
-        $subscription = $repo->subscription->createFor($user, $plan, $time->now());
+        $period = $plan->duration->toPeriod($time->getTimeNow());
+        $subscription = Subscription::create(
+            $user->id,
+            $plan->id,
+            $plan->price,
+            $period,
+        );
 
-        // avançar tempo até 2 dias antes do fim
-        $time->setNow(new \DateTimeImmutable('2025-04-29T08:00:00Z'));
+        $time = new TimeServiceFaker(new \DateTimeImmutable('2025-04-29T08:00:00Z'));
         $repo->user->save($user);
         $repo->plan->save($plan);
         $repo->subscription->save($subscription);
 
-        $input = new RenewSubscriptionInput($user->id, $plan->id);
-        $useCase = new RenewSubscription($repo->subscription, $repo->plan, $repo->user, $time);
-        $output = $useCase->execute($input);
+        $useCase = new RenewPlan($repo->subscription, $repo->user, $repo->plan, $time);
+        $output = $useCase->execute($user->id);
 
-        // início = fim da anterior
         expect($output->period->start->format('Y-m-d'))->toBe('2025-05-01');
         expect($output->period->end->format('Y-m-d'))->toBe('2025-06-01');
-    });
-
-    it('should fail if subscription is canceled or already expired', function () {
-        // crie assinatura, cancele ou avance o time além do fim, e espere exceção
     });
 });
