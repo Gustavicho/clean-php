@@ -1,6 +1,6 @@
 <?php
 
-namespace DDD\Service\Random;
+namespace DDD\Bundle\Service\Random;
 
 final class RandomGenerator
 {
