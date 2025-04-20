@@ -5,7 +5,7 @@ namespace DDD\Subscription\Application;
 use DDD\Subscription\Infra\Repository\SubscriptionRepositoryI;
 use DDD\User\Infra\Repository\UserRepositoryI;
 
-final class RenewPlan
+final class MarkAsPastDue
 {
     public function __construct(
         private readonly SubscriptionRepositoryI $repo,
@@ -21,11 +21,9 @@ final class RenewPlan
         $subscription = $this->repo->findByUser($user)
           ?? throw new \DomainException('user don\'t has a subscribtion');
 
-        $subscription->renew();
+        $subscription->markPastDue();
         $this->repo->update($subscription);
 
-        // TODO: dispatch event -> waiting payment confimation
-
-        return 'waiting payment confimation';
+        return 'plan is past due';
     }
 }

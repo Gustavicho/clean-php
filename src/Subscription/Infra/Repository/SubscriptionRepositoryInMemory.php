@@ -3,6 +3,7 @@
 namespace DDD\Subscription\Infra\Repository;
 
 use DDD\Subscription\Domain\Subscription;
+use DDD\User\Domain\User;
 
 final class SubscriptionRepositoryInMemory implements SubscriptionRepositoryI
 {
@@ -34,6 +35,13 @@ final class SubscriptionRepositoryInMemory implements SubscriptionRepositoryI
         }
 
         throw new \DomainException('User not found for update');
+    }
+
+    public function findByUser(User $user): ?Subscription
+    {
+        return $this->firstWhere(function (Subscription $subscription) use ($user) {
+            return $subscription->userId === $user->id;
+        });
     }
 
     private function filter(\Closure $closure): \ArrayObject

@@ -1,11 +1,12 @@
 <?php
 
-namespace DDD\Subscription\Application;
+namespace DDD\Subscription\Application\Service;
 
+use DDD\Subscription\Domain\Subscription;
 use DDD\Subscription\Infra\Repository\SubscriptionRepositoryI;
 use DDD\User\Infra\Repository\UserRepositoryI;
 
-final class RenewPlan
+final class FinderService implements FinderServiceI
 {
     public function __construct(
         private readonly SubscriptionRepositoryI $repo,
@@ -13,19 +14,14 @@ final class RenewPlan
     ) {
     }
 
-    public function execute(string $userId): string
+    public function findSubscriptionByUserId(string $userId): Subscription
     {
         $user = $this->userRepo->findById($userId)
           ?? throw new \DomainException('user not found');
 
         $subscription = $this->repo->findByUser($user)
-          ?? throw new \DomainException('user don\'t has a subscribtion');
+          ?? throw new \DomainException('user don\'t has a subscription');
 
-        $subscription->renew();
-        $this->repo->update($subscription);
-
-        // TODO: dispatch event -> waiting payment confimation
-
-        return 'waiting payment confimation';
+        return $subscription;
     }
 }

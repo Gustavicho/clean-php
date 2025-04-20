@@ -2,14 +2,16 @@
 
 namespace DDD\Subscription\Application;
 
+use DDD\Bundle\Service\Time\TimeServiceI;
 use DDD\Subscription\Infra\Repository\SubscriptionRepositoryI;
 use DDD\User\Infra\Repository\UserRepositoryI;
 
-final class RenewPlan
+final class ExpireSubscription
 {
     public function __construct(
         private readonly SubscriptionRepositoryI $repo,
         private readonly UserRepositoryI $userRepo,
+        private readonly TimeServiceI $time,
     ) {
     }
 
@@ -21,11 +23,13 @@ final class RenewPlan
         $subscription = $this->repo->findByUser($user)
           ?? throw new \DomainException('user don\'t has a subscribtion');
 
-        $subscription->renew();
+        if ($subscription->period->isInPeriod($this->time->getTimeNow())) {
+            throw new \DomainException('can\'t expire a valid subscription');
+        }
+
+        $subscription->expire();
         $this->repo->update($subscription);
 
-        // TODO: dispatch event -> waiting payment confimation
-
-        return 'waiting payment confimation';
+        return 'plan is expired';
     }
 }

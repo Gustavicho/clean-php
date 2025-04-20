@@ -4,7 +4,7 @@ namespace DDD\Subscription\Domain;
 
 use Brick\Money\Currency;
 use Brick\Money\Money;
-use DDD\Service\Random\RandomGenerator;
+use DDD\Bundle\Service\Random\RandomGenerator;
 use DDD\Subscription\Domain\State\PendingState;
 use DDD\Subscription\Domain\State\SubscriptionState;
 
@@ -34,6 +34,37 @@ final class Subscription
             Money::zero(Currency::of('BRL')),
             Money::zero(Currency::of('BRL'))
         );
+    }
+
+    public function state(): SubscriptionState
+    {
+        return $this->state;
+    }
+
+    public function discount(): Money
+    {
+        return $this->discount();
+    }
+
+    public function fee(): Money
+    {
+        return $this->fee();
+    }
+
+    public function total(): Money
+    {
+        return $this->price->plus($this->fee)->minus($this->discount);
+    }
+
+    public function updateFee(Money $fee): self
+    {
+        if ($fee->isNegativeOrZero()) {
+            throw new \DomainException('Can\'t aceppt value equal or less than Zero');
+        }
+
+        $this->fee = $fee;
+
+        return $this;
     }
 
     /**
