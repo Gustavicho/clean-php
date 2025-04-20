@@ -2,6 +2,7 @@
 
 namespace DDD\Subscription\Application;
 
+use DDD\Subscription\Application\Output\RenewPlanOutput;
 use DDD\Subscription\Infra\Repository\SubscriptionRepositoryI;
 use DDD\User\Infra\Repository\UserRepositoryI;
 
@@ -13,7 +14,7 @@ final class RenewPlan
     ) {
     }
 
-    public function execute(string $userId): string
+    public function execute(string $userId): RenewPlanOutput
     {
         $user = $this->userRepo->findById($userId)
           ?? throw new \DomainException('user not found');
@@ -26,6 +27,13 @@ final class RenewPlan
 
         // TODO: dispatch event -> waiting payment confimation
 
-        return 'waiting payment confimation';
+        return new RenewPlanOutput(
+            $subscription->id,
+            $subscription->userId,
+            $subscription->planId,
+            $subscription->price,
+            $subscription->period,
+            $subscription->state(),
+        );
     }
 }
