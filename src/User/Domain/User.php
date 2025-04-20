@@ -2,7 +2,7 @@
 
 namespace DDD\User\Domain;
 
-use DDD\Service\Random\RandomGenerator;
+use DDD\Bundle\Service\Random\RandomGenerator;
 
 final class User
 {

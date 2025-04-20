@@ -3,6 +3,7 @@
 namespace DDD\Plan\Infra\Repository;
 
 use DDD\Plan\Domain\Plan;
+use DDD\User\Domain\User;
 
 final class PlanRepositoryInMemory implements PlanRepositoryI
 {

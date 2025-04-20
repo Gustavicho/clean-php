@@ -3,7 +3,7 @@
 namespace DDD\Plan\Domain;
 
 use Brick\Money\Money;
-use DDD\Service\Random\RandomGenerator;
+use DDD\Bundle\Service\Random\RandomGenerator;
 
 final class Plan
 {
